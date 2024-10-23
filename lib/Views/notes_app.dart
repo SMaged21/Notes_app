@@ -7,7 +7,7 @@ class NotesApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: NotesWidget(),
+      body: SafeArea(child: NotesWidget()),
     );
   }
 }
