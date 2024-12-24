@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomSeaarchIcon extends StatelessWidget {
-  const CustomSeaarchIcon({super.key});
-
+  const CustomSeaarchIcon({super.key, required this.icon});
+  final IconData icon;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -11,7 +11,7 @@ class CustomSeaarchIcon extends StatelessWidget {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.white.withOpacity(.1)),
-      child: Icon(Icons.search, size: 28),
+      child: Icon(icon, size: 28),
     );
   }
 }
