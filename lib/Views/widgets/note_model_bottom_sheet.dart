@@ -1,16 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notes_app/Views/widgets/custom_button.dart';
 import 'package:notes_app/Views/widgets/custom_textfield.dart';
+import 'package:notes_app/cubit/addNote/add_note_cubit.dart';
+import 'package:notes_app/cubit/addNote/add_note_state.dart';
+import 'package:notes_app/models/note_model.dart';
 
 class NoteModelBottomSheet extends StatelessWidget {
   const NoteModelBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: SingleChildScrollView(
-        child: AddNoteForm(),
+    return BlocProvider(
+      create: (context) => AddNoteCubit(),
+      child: BlocConsumer<AddNoteCubit, AddNoteState>(
+        listener: (context, state) {
+          if (state is AddNoteSuccess) {
+            Navigator.pop(context);
+          }
+
+          if (state is AddNoteError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          return AbsorbPointer(
+            absorbing: state is AddNoteLoading ? true : false,
+            child: Padding(
+              padding: EdgeInsets.only(
+                  left: 16.0,
+                  right: 16,
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: const SingleChildScrollView(child: AddNoteForm()),
+            ),
+          );
+        },
       ),
     );
   }
@@ -32,6 +60,7 @@ class _AddNoteFormState extends State<AddNoteForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: formKey,
       autovalidateMode: autovalidateMode,
       child: Column(
         children: [
@@ -57,15 +86,27 @@ class _AddNoteFormState extends State<AddNoteForm> {
           const SizedBox(
             height: 16,
           ),
-          CustomButton(
-            onTap: () {
-              if (formKey.currentState != null &&
-                  formKey.currentState!.validate()) {
-                formKey.currentState!.save();
-              } else {
-                autovalidateMode = AutovalidateMode.always;
-                setState(() {});
-              }
+          BlocBuilder<AddNoteCubit, AddNoteState>(
+            builder: (context, state) {
+              return CustomButton(
+                isLoading: state is AddNoteLoading ? true : false,
+                onTap: () {
+                  if (formKey.currentState!.validate()) {
+                    formKey.currentState!.save();
+
+                    var note = NoteModel(
+                      title: title!,
+                      content: content!,
+                      date: DateTime.now().toString(),
+                      color: Colors.blue.value,
+                    );
+                    BlocProvider.of<AddNoteCubit>(context).addNote(note);
+                  } else {
+                    autovalidateMode = AutovalidateMode.always;
+                    setState(() {});
+                  }
+                },
+              );
             },
           ),
           const SizedBox(
