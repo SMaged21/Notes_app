@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:notes_app/Views/edit_note_item_view.dart';
-import 'package:notes_app/constants.dart';
-import 'package:notes_app/cubit/note_cubit/note_cubit.dart';
 import 'package:notes_app/models/note_model.dart';
 
 class NoteItem extends StatelessWidget {
-  const NoteItem({super.key, required this.note, required this.id});
+  const NoteItem({super.key, required this.note});
   final NoteModel note;
-  final int id;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return const EditNoteItemView();
+          return EditNoteItemView(note: note);
         }));
       },
       child: Container(
@@ -40,8 +35,7 @@ class NoteItem extends StatelessWidget {
               ),
               trailing: IconButton(
                 onPressed: () {
-                  Hive.box<NoteModel>(kNotesBox).deleteAt(id);
-                  BlocProvider.of<NoteCubit>(context).fetchAllNotes();
+                  note.delete();
                 },
                 icon: const Icon(
                   Icons.delete,
