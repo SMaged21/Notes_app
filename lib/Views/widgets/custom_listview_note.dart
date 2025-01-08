@@ -22,6 +22,7 @@ class ListViewNote extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: NoteItem(
                     note: notes[item],
+                    id: item,
                   ),
                 );
               }),
